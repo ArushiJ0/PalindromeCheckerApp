@@ -1,15 +1,17 @@
 import java.util.*;
-
-public class PalindromeCheckerApp {
-
-    interface PalindromeStrategy {
-        boolean check(String input);
-    }
-
-    static class StackStrategy implements PalindromeStrategy {
-        public boolean check(String input) {
+    public class PalindromeCheckerApp {
+        static boolean twoPointer(String input) {
+            int start = 0, end = input.length() - 1;
+            while (start < end) {
+                if (input.charAt(start) != input.charAt(end))
+                    return false;
+                start++;
+                end--;
+            }
+            return true;
+        }
+        static boolean stackMethod(String input) {
             Stack<Character> stack = new Stack<>();
-
             for (char c : input.toCharArray())
                 stack.push(c);
 
@@ -19,12 +21,8 @@ public class PalindromeCheckerApp {
 
             return true;
         }
-    }
-
-    static class DequeStrategy implements PalindromeStrategy {
-        public boolean check(String input) {
+        static boolean dequeMethod(String input) {
             Deque<Character> deque = new ArrayDeque<>();
-
             for (char c : input.toCharArray())
                 deque.addLast(c);
 
@@ -34,29 +32,31 @@ public class PalindromeCheckerApp {
 
             return true;
         }
-    }
 
-    static class PalindromeChecker {
-        private PalindromeStrategy strategy;
+        static void measure(String name, String input) {
+            long startTime = System.nanoTime();
 
-        public PalindromeChecker(PalindromeStrategy strategy) {
-            this.strategy = strategy;
+            boolean result = false;
+            if (name.equals("TwoPointer"))
+                result = twoPointer(input);
+            else if (name.equals("Stack"))
+                result = stackMethod(input);
+            else if (name.equals("Deque"))
+                result = dequeMethod(input);
+
+            long endTime = System.nanoTime();
+
+            System.out.println(name + " -> Result: " + result +
+                    ", Time: " + (endTime - startTime) + " ns");
         }
 
-        public boolean check(String input) {
-            return strategy.check(input);
+        public static void main(String[] args) {
+
+            String input = "racecar";
+            System.out.println("Input: " + input);
+
+            measure("TwoPointer", input);
+            measure("Stack", input);
+            measure("Deque", input);
         }
     }
-
-    public static void main(String[] args) {
-
-        String input = "level";
-        System.out.println("Input: " + input);
-
-        PalindromeStrategy strategy = new StackStrategy();
-        PalindromeChecker checker = new PalindromeChecker(strategy);
-        boolean result = checker.check(input);
-
-        System.out.println("Is Palindrome? : " + result);
-    }
-}
